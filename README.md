@@ -1,3 +1,3 @@
-###Weather App
+# Weather App
 
-This repository contains my weather app project for MOBI-3002
+This repository contains my weather app project for MOBI-3002. 
