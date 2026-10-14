@@ -1,21 +1,16 @@
 package com.example.weatherapp.ui.Screens
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.weatherapp.R
@@ -35,6 +30,12 @@ fun DailyScreen(){
             Image(
                 painter = painterResource(id = R.drawable.sun),
                 contentDescription = "Clear Day")
+        }
+        Row() {
+            Text(
+                "October 1st",
+                fontSize = 20.sp
+            )
         }
         Row() {
             Text("18°C",

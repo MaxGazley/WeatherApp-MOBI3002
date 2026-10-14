@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +25,7 @@ fun WeeklyScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(top = 15.dp)
-
+            .verticalScroll(rememberScrollState())
     ) {
         Row(
             modifier = Modifier
@@ -34,6 +35,12 @@ fun WeeklyScreen() {
                 painter = painterResource(id = R.drawable.sun),
                 contentDescription = "Clear Day",
                 Modifier.size(50.dp)
+            )
+        }
+        Row() {
+            Text(
+                "October 1st",
+                fontSize = 15.sp
             )
         }
         Row() {
@@ -63,6 +70,12 @@ fun WeeklyScreen() {
         }
         Row() {
             Text(
+                "October 2nd",
+                fontSize = 15.sp
+            )
+        }
+        Row() {
+            Text(
                 "15°C",
                 fontSize = 25.sp
             )
@@ -83,6 +96,12 @@ fun WeeklyScreen() {
                 painter = painterResource(id = R.drawable.heavy_rain),
                 contentDescription = "Heavy rain",
                 Modifier.size(50.dp)
+            )
+        }
+        Row() {
+            Text(
+                "October 3rd",
+                fontSize = 15.sp
             )
         }
         Row() {
