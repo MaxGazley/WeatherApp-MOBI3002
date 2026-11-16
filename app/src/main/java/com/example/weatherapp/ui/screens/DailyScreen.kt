@@ -18,15 +18,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
@@ -49,7 +45,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
-val iconCache = LruCache<String, Bitmap>(60)
+private val iconCache = LruCache<String, Bitmap>(60)
 
 /** Downloads an image from [model] (a URL) and shows it. Cached in memory; blank while loading/failed. */
 @Composable
@@ -75,8 +71,9 @@ fun WeatherIcon(model: String, contentDescription: String?, modifier: Modifier =
     }
 }
 
-// ======================= HELPERS =======================
+// ======================= HELPERS (shared with WeeklyScreen) =======================
 
+/** The API returns icons as "//cdn.weatherapi.com/..." so add the scheme. */
 fun Condition.iconUrl(): String =
     if (icon.startsWith("//")) "https:$icon" else icon
 
@@ -97,13 +94,13 @@ fun Weather.upcomingHours(): List<Pair<String, HourForecast>> {
 }
 
 // ======================= SCREEN =======================
+// No Scaffold/TopAppBar here: Navigation already provides them.
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyScreen(viewModel: MainViewModel) {
     val weather = viewModel.weather
 
-    // Show a spinner until the API data has loaded (replaces the unsafe weather!!)
+    // Spinner until the API data has loaded
     if (weather == null) {
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -115,57 +112,45 @@ fun DailyScreen(viewModel: MainViewModel) {
     val hours = remember(weather) { weather.upcomingHours() }
     val todayRainChance = weather.forecast.forecastDay.firstOrNull()?.day?.rainChance ?: 0
 
-    Scaffold(topBar = { TopAppBar(title = { Text("Weather") }) }) { padding ->
-        Column(
-            Modifier
-                .padding(padding)
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(weather.location.name, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-            Text(
-                "${weather.location.region}, ${weather.location.country}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            WeatherIcon(
-                model = current.condition.iconUrl(),
-                contentDescription = current.condition.text,
-                modifier = Modifier.size(120.dp)
-            )
-            Text("${current.temp.roundToInt()}°C", fontSize = 64.sp, fontWeight = FontWeight.Light)
-            Text(current.condition.text, fontSize = 18.sp)
-            Text("Feels like ${current.feelsLike.deg()}")
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(modifier = Modifier.height(40.dp))
+        WeatherIcon(
+            model = current.condition.iconUrl(),
+            contentDescription = current.condition.text,
+            modifier = Modifier.size(120.dp)
+        )
+        Text("${current.temp.roundToInt()}°C", fontSize = 64.sp, fontWeight = FontWeight.Light)
+        Text(current.condition.text, fontSize = 18.sp)
+        Text("Feels like ${current.feelsLike.deg()}")
 
-            Spacer(Modifier.height(16.dp))
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                Stat("Rain now", "${current.totalPrecipitation} mm")
-                Stat("Chance today", "$todayRainChance%")
-                Stat("Wind", "${current.windSpeed.roundToInt()} km/h ${current.windDirection}")
-            }
+        Spacer(Modifier.height(16.dp))
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+            Stat("Total Precipitation", "${current.totalPrecipitation} mm")
+            Stat("Chance of rain", "$todayRainChance%")
+            Stat("Wind", "${current.windSpeed.roundToInt()} km/h ${current.windDirection}")
+        }
 
-            Spacer(Modifier.height(24.dp))
-            Text(
-                "Hourly forecast",
-                Modifier.align(Alignment.Start),
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(Modifier.height(8.dp))
-            LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(hours) { (label, hour) -> HourCard(label, hour) }
-            }
-
-//            Spacer(Modifier.height(24.dp))
-//            Button(onClick = onOpenForecast, modifier = Modifier.fillMaxWidth()) {
-//                Text("3-day forecast")
-//            }
+        Spacer(Modifier.height(24.dp))
+        Text(
+            "Hourly forecast",
+            Modifier.align(Alignment.Start),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(Modifier.height(8.dp))
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(hours) { (label, hour) -> HourCard(label, hour) }
         }
     }
 }
 
 @Composable
-fun Stat(label: String, value: String) {
+private fun Stat(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, fontWeight = FontWeight.SemiBold)
         Text(label, style = MaterialTheme.typography.labelSmall)
@@ -173,7 +158,7 @@ fun Stat(label: String, value: String) {
 }
 
 @Composable
-fun HourCard(label: String, h: HourForecast) {
+private fun HourCard(label: String, h: HourForecast) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
         Column(
             Modifier.padding(horizontal = 14.dp, vertical = 10.dp),

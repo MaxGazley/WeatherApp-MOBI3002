@@ -40,6 +40,7 @@ fun Navigation() {
     var selectedIndex by remember { mutableIntStateOf(0) }
     val viewModel : MainViewModel = viewModel()
 
+
     // Begin: Ask permission to get device location.
     // Note: If permission is previously granted, the dialog won't appear and refreshLocation() will get called.
     val launcher = rememberLauncherForActivityResult(
@@ -67,18 +68,21 @@ fun Navigation() {
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = { Text("Halifax, Nova Scotia") }
+                title = {
+                    val loc = viewModel.weather?.location
+                    Text(if (loc != null) "${loc.name}, ${loc.region}" else "Loading...")
+                }
             )
         },
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.CalendarToday, contentDescription = "Daily") },
-                    label = { Text("Daily") },
+                    label = { Text("Today") },
                     selected = selectedIndex == 0,
                     onClick = {
                         selectedIndex = 0
-                        navController.navigate(route="Daily"){
+                        navController.navigate(route="Today"){
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -89,11 +93,11 @@ fun Navigation() {
                 )
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.CalendarViewWeek, contentDescription = "Weekly") },
-                    label = { Text("Weekly") },
+                    label = { Text("Forecast") },
                     selected = selectedIndex == 1,
                     onClick = {
                         selectedIndex = 1
-                        navController.navigate(route="Weekly"){
+                        navController.navigate(route="Forecast"){
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }
@@ -107,11 +111,11 @@ fun Navigation() {
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = "Daily",
+            startDestination = "Today",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("Daily") { DailyScreen(viewModel) }
-            composable("Weekly") { WeeklyScreen(viewModel) }
+            composable("Today") { DailyScreen(viewModel) }
+            composable("Forecast") { WeeklyScreen(viewModel) }
         }
     }
 }
