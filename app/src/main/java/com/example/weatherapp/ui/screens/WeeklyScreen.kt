@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import com.example.weatherapp.MainViewModel
 import com.example.weatherapp.data.dao.Condition
 import com.example.weatherapp.data.dao.DayPart
@@ -38,7 +39,6 @@ private fun List<HourForecast>.dayParts(): List<DayPart> =
 
 // ======================= SCREEN =======================
 
-// No Scaffold/TopAppBar/back button here: Navigation already provides the bars and tabs.
 @Composable
 fun WeeklyScreen(viewModel: MainViewModel) {
     val weather = viewModel.weather
@@ -80,7 +80,7 @@ fun WeeklyScreen(viewModel: MainViewModel) {
                         day.hour.dayParts().forEach { p ->
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(p.label, style = MaterialTheme.typography.labelLarge)
-                                WeatherIcon(
+                                AsyncImage(
                                     model = p.condition.iconUrl(),
                                     contentDescription = p.condition.text,
                                     modifier = Modifier.size(52.dp)

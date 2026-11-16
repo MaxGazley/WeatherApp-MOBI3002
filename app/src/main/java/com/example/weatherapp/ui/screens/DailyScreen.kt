@@ -1,9 +1,5 @@
 package com.example.weatherapp.ui.screens
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.LruCache
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,52 +20,20 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.weatherapp.MainViewModel
 import com.example.weatherapp.data.dao.Condition
 import com.example.weatherapp.data.dao.HourForecast
 import com.example.weatherapp.data.dao.Weather
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
-
-private val iconCache = LruCache<String, Bitmap>(60)
-
-/** Downloads an image from [model] (a URL) and shows it. Cached in memory; blank while loading/failed. */
-@Composable
-fun WeatherIcon(model: String, contentDescription: String?, modifier: Modifier = Modifier) {
-    val bitmap by produceState<Bitmap?>(initialValue = null, model) {
-        value = iconCache.get(model) ?: withContext(Dispatchers.IO) {
-            try {
-                val conn = URL(model).openConnection() as HttpURLConnection
-                conn.connectTimeout = 5000
-                conn.readTimeout = 5000
-                conn.inputStream.use { BitmapFactory.decodeStream(it) }
-                    ?.also { iconCache.put(model, it) }
-            } catch (e: Exception) {
-                null
-            }
-        }
-    }
-    val bmp = bitmap
-    if (bmp != null) {
-        Image(bitmap = bmp.asImageBitmap(), contentDescription = contentDescription, modifier = modifier)
-    } else {
-        Box(modifier)
-    }
-}
 
 // ======================= HELPERS (shared with WeeklyScreen) =======================
 
@@ -120,7 +84,7 @@ fun DailyScreen(viewModel: MainViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(40.dp))
-        WeatherIcon(
+        AsyncImage(
             model = current.condition.iconUrl(),
             contentDescription = current.condition.text,
             modifier = Modifier.size(120.dp)
@@ -165,7 +129,7 @@ private fun HourCard(label: String, h: HourForecast) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(label, style = MaterialTheme.typography.labelMedium)
-            WeatherIcon(
+            AsyncImage(
                 model = h.condition.iconUrl(),
                 contentDescription = h.condition.text,
                 modifier = Modifier.size(44.dp)

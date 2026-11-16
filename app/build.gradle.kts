@@ -48,6 +48,7 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:3.0.0")
     // Location services
     implementation("com.google.android.gms:play-services-location:21.4.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
